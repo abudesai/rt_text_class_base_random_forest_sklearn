@@ -13,10 +13,7 @@ porter_stemmer=nltk.PorterStemmer()
 
 
 def Tokenizer(str_input):
-    tokens = re.sub(r"[^A-Za-z0-9\-]", " ", str_input).lower().split()
-    tokens = [t for t in tokens if len(t) > 2] # remove short words, they're probably not useful
-    tokens = [t for t in tokens if t not in stopwords] # remove stopwords    
-    tokens = [porter_stemmer.stem(t) for t in tokens]
+    tokens = tokenize(str_input)
     return tokens
 
 
@@ -30,6 +27,20 @@ def tokenize(document):
 
 
 class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
+    '''
+    Tokenizes the text column in given dataframe. 
+    Can be used to limit the vocabulary size. 
+    text_col: name of field with text in dataframe
+    vocab_size: max vocab size to use
+    keep_words: words to keep regardless of their frequency
+    start_token: token used to indicate start of text (if any)
+    end_token: token used to indicate end of text (if any)    
+    
+    Original code referenced from here: 
+    https://github.com/lazyprogrammer/machine_learning_examples/blob/master/rnn_class/brown.py
+    
+    '''   
+    
     def __init__(self, text_col, vocab_size=5000, keep_words=[], start_token=None, end_token=None):
         self.text_col = text_col
         self.vocab_size = vocab_size
@@ -109,24 +120,15 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
         return data
 
 
-class TextSelector(BaseEstimator, TransformerMixin):
-    def __init__(self, field):
-        self.field = field
-    def fit(self, X, y=None):
-        return self
-    def transform(self, X):
-        return X[self.field]
+class ColumnSelector(BaseEstimator, TransformerMixin):
+    def __init__(self, col):
+        self.col = col
+        
+    def fit(self, X, y=None):  return self
+    
+    def transform(self, X): return X[self.col]
     
     
-class NumberSelector(BaseEstimator, TransformerMixin):
-    def __init__(self, field):
-        self.field = field
-    def fit(self, X, y=None):
-        return self
-    def transform(self, X):
-        return X[[self.field]]
-
-
 class TypeCaster(BaseEstimator, TransformerMixin):  
     def __init__(self, vars, cast_type):
         super().__init__()
@@ -162,7 +164,7 @@ class FloatTypeCaster(TypeCaster):
         super(FloatTypeCaster, self).__init__(num_vars, float)
 
 
-class ColumnSelector(BaseEstimator, TransformerMixin):
+class ColumnsSelector(BaseEstimator, TransformerMixin):
     """Select only specified columns."""
     def __init__(self, columns, selector_type='keep'):
         self.columns = columns
@@ -173,8 +175,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         return self
     
     
-    def transform(self, X):   
-        
+    def transform(self, X):  
         if self.selector_type == 'keep':
             retained_cols = [col for col in X.columns if col in self.columns]
             X = X[retained_cols].copy()
@@ -213,12 +214,11 @@ class ArrayToDataFrameConverter(BaseEstimator, TransformerMixin):
         return self    
     
     def transform(self, data): 
-        N, D = data.shape 
-        
+        N, D = data.shape         
         if len(self.columns) != D: 
             raise Exception("Error. Data has more columns ({D}) than in prior fitted data ({len(self.columns)}). ")
         df = pd.DataFrame(data, columns=self.columns)
-        return df
+        return df 
     
 
 

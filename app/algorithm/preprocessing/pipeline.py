@@ -47,7 +47,7 @@ def get_preprocess_pipeline(model_cfg):
                         ( pp_step_names["TARGET_PIPELINE"], target_pipeline ),
                         (
                             pp_step_names["ID_SELECTOR"], 
-                            preprocessors.ColumnSelector(
+                            preprocessors.ColumnsSelector(
                                 columns=['id'],
                                 selector_type='keep'
                             ) 
@@ -89,8 +89,8 @@ def get_text_pipeline(model_cfg):
     # select the text column
     pipe_steps.append(
         (
-            pp_step_names["TARGET_SELECTOR"], 
-            preprocessors.TextSelector('text')
+            pp_step_names["TEXT_SELECTOR"], 
+            preprocessors.ColumnSelector('text')
         )
     )    
     # tf-idf vectorize
@@ -100,7 +100,7 @@ def get_text_pipeline(model_cfg):
             TfidfVectorizer(
                 # tokenizer=preprocessors.Tokenizer, # handled separately in step above
                 min_df=.0025, 
-                max_df=0.6, 
+                max_df=0.9, 
                 ngram_range=(1,1)
             )
         )
@@ -133,7 +133,7 @@ def get_target_pipeline(model_cfg):
     pipe_steps.append(
         (
             pp_step_names["TARGET_SELECTOR"], 
-            preprocessors.ColumnSelector(
+            preprocessors.ColumnsSelector(
                 columns=['class'],
                 selector_type='keep'
                 )
@@ -152,7 +152,7 @@ def get_target_pipeline(model_cfg):
     pipe_steps.append(
         (
             pp_step_names["TARGET_DROPPER"],
-            preprocessors.ColumnSelector(
+            preprocessors.ColumnsSelector(
                 columns=['class'],
                 selector_type='drop')
         )
@@ -162,9 +162,7 @@ def get_target_pipeline(model_cfg):
 
 
 
-class PandasFeatureUnion(FeatureUnion):
-    def dummy(self): pass
-    
+class PandasFeatureUnion(FeatureUnion):    
     def fit_transform(self, X, y=None, **fit_params):
         self._validate_transformers()
 

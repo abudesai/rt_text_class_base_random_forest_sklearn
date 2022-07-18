@@ -230,7 +230,7 @@ if __name__ == "__main__":
     
     num_hpt_trials = 20
     run_hpt_list = [False, True]
-    run_hpt_list = [True]
+    run_hpt_list = [False]
     
     datasets = ["clickbait", "drug_review", "movie_reviews2", "spam_text", "tweet_emotions"]
     datasets = ["movie_reviews2"]

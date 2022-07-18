@@ -24,7 +24,7 @@ def get_trained_model(data, data_schema, hyper_params):
     
     # we are not doing train/valid split 
     train_data = data
-    print('train_data shape:',  train_data.shape) #; sys.exit()
+    # print('train_data shape:',  train_data.shape) #; sys.exit()
     
     # balance the target classes  
     train_data = get_resampled_data(train_data)
