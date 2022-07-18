@@ -48,6 +48,7 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
         self.START_TOKEN = start_token
         self.END_TOKEN = end_token
         
+        
     def fit(self, data):
         sentences = list(data[self.text_col])
         
@@ -70,7 +71,6 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
         for sentence in sentences:
             tokens = tokenize(sentence)
             for token in tokens:
-                token = token.lower()
                 if token not in word2idx:
                     idx2word.append(token)
                     word2idx[token] = i
@@ -81,7 +81,7 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
                 word_idx_count[idx] = word_idx_count.get(idx, 0) + 1
         
         # set all the words we want to keep to infinity
-        # so that they are included when I pick the most
+        # so that they are included when we pick the most
         # common words
         for word in self.keep_words:
             word_idx_count[word2idx[word]] = float('inf')
@@ -111,12 +111,12 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
         for sentence in sentences:
             tokens = tokenize(sentence)
             new_sentence = [ token #str(self.word2idx_small[token])
-                                if token in self.word2idx_small else str(self.unknown)
+                                if token in self.word2idx_small else 'UNKNOWN'
                                 for token in tokens]
             new_sentence = " ".join(new_sentence)
             sentences_small.append(new_sentence)
         
-        data[self.text_col] = sentences_small
+        data[self.text_col] = sentences_small        
         return data
 
 
