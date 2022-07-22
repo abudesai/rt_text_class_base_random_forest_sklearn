@@ -3,6 +3,7 @@
 
 import io
 import pandas as pd
+import json
 import flask
 import traceback
 import sys
@@ -12,7 +13,7 @@ warnings.filterwarnings('ignore')
 
 import algorithm.utils as utils
 from algorithm.model_server import ModelServer
-
+from algorithm.model import classifier as model
 
 prefix = '/opt/ml_vol/'
 data_schema_path = os.path.join(prefix, 'inputs', 'data_config')
@@ -37,7 +38,8 @@ app = flask.Flask(__name__)
 def ping():
     """Determine if the container is working and healthy. """
     status = 200
-    response="I am alive!"
+    response=f"Hello - I am {model.MODEL_NAME} model and I am at your service!"
+    print(response)
     return flask.Response(response=response, status=status, mimetype="application/json")
 
 
@@ -49,12 +51,11 @@ def infer():
     just means one prediction per line, since there's a single column.
     """
     data = None
-
+    
     # Convert from CSV to pandas
-    if flask.request.content_type == "text/csv":
-        data = flask.request.data.decode("utf-8")
-        s = io.StringIO(data)
-        data = pd.read_csv(s)
+    if flask.request.content_type == "application/json":
+        data = json.loads(flask.request.data)
+        data = pd.DataFrame([data])        
     else:                
         return flask.Response(
             response="This predictor only supports CSV data", 

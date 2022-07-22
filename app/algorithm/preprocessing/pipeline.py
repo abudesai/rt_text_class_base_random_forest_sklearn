@@ -37,6 +37,13 @@ def get_preprocess_pipeline(model_cfg):
     main_pipeline = Pipeline(
         [
             (
+                pp_step_names["TARGET_FEATURE_ADDER"],
+                preprocessors.TargetFeatureAdder(
+                    target_col='class',
+                    fill_value = model_cfg['target_dummy_val']
+                    ),
+            ),
+            (
                 pp_step_names["FEATURE_UNION"], PandasFeatureUnion(
                     [
                         ( pp_step_names["TEXT_PIPELINE"], text_pipeline ),
@@ -139,7 +146,10 @@ def get_target_pipeline(model_cfg):
     pipe_steps.append(
         (
             pp_step_names["LABEL_ENCODER"],
-            preprocessors.CustomLabelEncoder( target_col='class' ),
+            preprocessors.CustomLabelEncoder( 
+                target_col='class',
+                dummy_label=model_cfg['target_dummy_val'],
+                ),
         )
     )  
            

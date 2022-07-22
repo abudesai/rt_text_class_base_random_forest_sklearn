@@ -54,5 +54,6 @@
     "preds_col_name": "predictionFieldName"
   },
   "valid_split": 0.1,
-  "max_resample_of_minority_classes": 5
+  "max_resample_of_minority_classes": 5,
+  "target_dummy_val": "__target__"
 }

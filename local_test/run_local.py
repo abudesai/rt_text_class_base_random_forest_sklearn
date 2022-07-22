@@ -237,7 +237,7 @@ if __name__ == "__main__":
     run_hpt_list = [False]
     
     datasets = ["clickbait", "drug_review", "movie_reviews2", "spam_text", "tweet_emotions"]
-    datasets = ["movie_reviews2"]
+    datasets = ["spam_text"]
     
     for run_hpt in run_hpt_list:
         all_results = []

@@ -16,9 +16,9 @@ data_path = os.path.join(prefix, 'inputs', 'data')
 data_schema_path = os.path.join(prefix, 'inputs', 'data_config')
 model_path = os.path.join(prefix, 'model', 'artifacts')
 hyper_param_path = os.path.join(prefix, 'model', 'model_config')
-hpt_results_path = os.path.join(prefix, 'hpt', 'results')
-failure_path = os.path.join(prefix, 'outputs', 'tune_failure')
 output_path = os.path.join(prefix, 'outputs')
+hpt_results_path = os.path.join(output_path, 'hpt_outputs')
+failure_path = os.path.join(output_path, 'errors', 'tune_failure')
 
 channel_name='training'
 training_path = os.path.join(data_path, channel_name)
@@ -29,7 +29,7 @@ def tune(num_trials=10):
     try:        
         print('Starting the hyperparameter tuning.')  
         # Read data
-        train_data = utils.get_data(training_path)
+        train_data = utils.get_data(training_path, data_type="training")   
         # read data config
         data_schema = utils.get_data_schema(data_schema_path)
         # run hyper-parameter tuning. This saves results in each trial, so nothing is returned
@@ -51,7 +51,7 @@ def tune(num_trials=10):
     
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--num_trials", type=int, default=10, help="the number of trials to run for HPO")
+    parser.add_argument("-n", "--num_trials", type=int, default=3, help="the number of trials to run for HPO")
     args = parser.parse_args()
     
     tune(num_trials=args.num_trials)

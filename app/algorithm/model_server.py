@@ -50,11 +50,10 @@ class ModelServer:
         proc_data = preprocessor.transform(data) 
         pred_X = proc_data['X'].astype(np.float)   
         preds = model.predict_proba( pred_X )
-
         return preds    
     
     
-    def predict_proba(self, data, data_schema):          
+    def predict_proba(self, data, data_schema):       
         preds = self._get_predictions(data, data_schema)
         class_names = pipeline.get_class_names(self.preprocessor, model_cfg)   
         # return the prediction df with the id and class probability fields        
@@ -63,7 +62,7 @@ class ModelServer:
     
     
     
-    def predict(self, data, data_schema):
+    def predict(self, data, data_schema):                
         preds = self._get_predictions(data, data_schema)   
         class_names = pipeline.get_class_names(self.preprocessor, model_cfg)  
         

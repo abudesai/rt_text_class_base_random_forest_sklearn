@@ -120,6 +120,21 @@ class CustomTokenizerWithLimitedVocab(BaseEstimator, TransformerMixin):
         return data
 
 
+class TargetFeatureAdder(BaseEstimator, TransformerMixin): 
+    def __init__(self, target_col, fill_value) -> None:
+        super().__init__()
+        self.target_col = target_col
+        self.fill_value = fill_value
+    
+    def fit(self, data): return self
+    
+    def transform(self, data): 
+        if self.target_col not in data.columns: 
+            data[self.target_col] = self.fill_value
+        return data
+
+
+
 class ColumnSelector(BaseEstimator, TransformerMixin):
     def __init__(self, col):
         self.col = col
@@ -190,20 +205,6 @@ class ColumnsSelector(BaseEstimator, TransformerMixin):
         return X
     
  
-
-class TargetFeatureAdder(BaseEstimator, TransformerMixin): 
-    def __init__(self, label_field_name) -> None:
-        super().__init__()
-        self.label_field_name = label_field_name
-    
-    def fit(self, data): return self
-    
-    def transform(self, data): 
-        if self.label_field_name not in data.columns: 
-            data[self.label_field_name] = 0.
-        return data
-
-
 class ArrayToDataFrameConverter(BaseEstimator, TransformerMixin): 
     def __init__(self):
         self.cols = None
@@ -223,9 +224,10 @@ class ArrayToDataFrameConverter(BaseEstimator, TransformerMixin):
 
 
 class CustomLabelEncoder(BaseEstimator, TransformerMixin): 
-    def __init__(self, target_col) -> None:
+    def __init__(self, target_col, dummy_label) -> None:
         super().__init__()
         self.target_col = target_col
+        self.dummy_label = dummy_label
         self.lb = LabelEncoder()
 
 
@@ -237,7 +239,7 @@ class CustomLabelEncoder(BaseEstimator, TransformerMixin):
     
     def transform(self, data): 
         check_val_if_pred = data.loc[0, self.target_col]
-        if self.target_col in data.columns and check_val_if_pred != "__prediction__": 
+        if self.target_col in data.columns and check_val_if_pred != self.dummy_label: 
             data[self.target_col] = self.lb.transform(data[self.target_col])
         return data
 

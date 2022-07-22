@@ -4,7 +4,6 @@ import numpy as np, pandas as pd, random
 import sys, os
 import glob
 import json
-import tensorflow as tf
 
 
 
@@ -13,7 +12,6 @@ def set_seeds(seed_value=42):
         os.environ['PYTHONHASHSEED']=str(seed_value)
         random.seed(seed_value)
         np.random.seed(seed_value)
-        tf.random.set_seed(seed_value)
     else: 
         print(f"Invalid seed value: {seed_value}. Cannot set seeds.")
 
@@ -25,11 +23,7 @@ def read_documents_into_df(dir_path, class_ = None):
         with open(f,mode='r', encoding="utf-8") as fh:
             documents.append([os.path.basename(f), fh.read()])    
     df = pd.DataFrame(documents, columns=["id", "text"])
-    if class_ is not None:  df["class"] = class_ 
-    else: 
-        # bit hacky, but need a y column created even for predictions 
-        # otherwise the feature union in preprocessing pipeline complains
-        df["class"] = "__prediction__"      
+    if class_ is not None:  df["class"] = class_        
     return df
 
 
