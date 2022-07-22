@@ -25,7 +25,11 @@ def read_documents_into_df(dir_path, class_ = None):
         with open(f,mode='r', encoding="utf-8") as fh:
             documents.append([os.path.basename(f), fh.read()])    
     df = pd.DataFrame(documents, columns=["id", "text"])
-    df["class"] = class_      
+    if class_ is not None:  df["class"] = class_ 
+    else: 
+        # bit hacky, but need a y column created even for predictions 
+        # otherwise the feature union in preprocessing pipeline complains
+        df["class"] = "__prediction__"      
     return df
 
 

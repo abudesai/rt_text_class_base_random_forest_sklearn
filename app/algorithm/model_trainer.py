@@ -50,9 +50,7 @@ def train_model(train_X, train_y, hyper_params):
     
     # Create and train model   
     model = Classifier(  **model_params )  
-    # model.summary()  
     model.fit(train_X, train_y)    
-    # score = model.evaluate(train_X, train_y) ; print("score", score) #; sys.exit()
     
     return model
 

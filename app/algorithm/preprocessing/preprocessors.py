@@ -4,7 +4,7 @@ import nltk
 import re
 import sys , os
 import operator
-
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
 
 stop_words_path = os.path.join(os.path.dirname(__file__), 'stop_words.txt')
@@ -222,26 +222,25 @@ class ArrayToDataFrameConverter(BaseEstimator, TransformerMixin):
     
 
 
-class TargetOneHotEncoder(BaseEstimator, TransformerMixin): 
-    def __init__(self, target_col):
+class CustomLabelEncoder(BaseEstimator, TransformerMixin): 
+    def __init__(self, target_col) -> None:
+        super().__init__()
         self.target_col = target_col
-        self.target_classes = None
-        self.col_names = None        
+        self.lb = LabelEncoder()
+
+
+    def fit(self, data):                
+        self.lb.fit(data[self.target_col])             
+        self.classes_ = self.lb.classes_ 
+        return self 
     
-    def fit(self, data): 
-        self.target_classes = data[self.target_col].drop_duplicates().tolist() 
-        self.col_names = [ self.target_col + "__" + str(c) for c in self.target_classes]        
-        return self    
     
-    def transform(self, data):  
-        df_list = [data]
-        for i, class_ in enumerate(self.target_classes):
-            vals = np.where(data[self.target_col] == class_, 1, 0)
-            df = pd.DataFrame(vals, columns=[self.col_names[i]])
-            df_list.append(df)         
-        transformed_data = pd.concat(df_list, axis=1, ignore_index=True) 
-        transformed_data.columns =  list(data.columns) + self.col_names
-        return transformed_data
+    def transform(self, data): 
+        check_val_if_pred = data.loc[0, self.target_col]
+        if self.target_col in data.columns and check_val_if_pred != "__prediction__": 
+            data[self.target_col] = self.lb.transform(data[self.target_col])
+        return data
+
 
 
 class XYSplitter(BaseEstimator, TransformerMixin): 
@@ -251,17 +250,16 @@ class XYSplitter(BaseEstimator, TransformerMixin):
     
     def fit(self, data): return self
     
-    def transform(self, data):  
-        ohe_target_cols = [col for col in data.columns if col.startswith(self.target_col + "__")]
-        if len(ohe_target_cols) > 0: 
-            y = data[ohe_target_cols].values
+    def transform(self, data): 
+        if self.target_col in data.columns: 
+            y = data[self.target_col].values
         else: 
             y = None
         
-        not_X_cols = [ self.id_col ] + ohe_target_cols 
-        X_cols = [ col for col in data.columns if col not in not_X_cols ]
-        X = data[X_cols].values                
-        return { 'X': X, 'y': y }
+        not_X_cols = [ self.id_col, self.target_col ] 
+        X_cols = [ col for col in data.columns if col not in not_X_cols ]        
+        X = data[X_cols].values           
+        return { 'X': X, 'y': y  }
     
         
     

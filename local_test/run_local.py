@@ -139,9 +139,9 @@ def set_scoring_vars(dataset_name):
 
 
 def score(predictions): 
-    class_names = list(predictions.columns[1:])
-    
+    class_names = list(predictions.columns[1:])    
     predictions['pred_class'] = pd.DataFrame(predictions[class_names], columns = class_names).idxmax(axis=1) 
+    
     predictions = predictions.merge(test_answers, left_on=['id'], right_on=['file_name'])
     del predictions['file_name']
     
@@ -201,15 +201,19 @@ def get_file_path_and_name(run_hpt, dataset_name):
 
 
 def run_train_and_test(dataset_name, run_hpt, num_hpt_trials):
-    start = time.time()
-    
-    create_ml_vol()   # create the directory which imitates the bind mount on container
-    copy_example_files(dataset_name)   # copy the required files for model training    
-    if run_hpt: run_HPT(num_hpt_trials)               # run HPT and save tuned hyperparameters
-    train_and_save_algo()        # train the model and save
-    
+    start = time.time()    
+    # create the directory which imitates the bind mount on container
+    create_ml_vol()   
+    # copy the required files for model training    
+    copy_example_files(dataset_name)   
+    # run HPT and save tuned hyperparameters
+    if run_hpt: run_HPT(num_hpt_trials)     
+    # train the model and save          
+    train_and_save_algo()        
+    # this sets some global variables used in scoring
     set_scoring_vars(dataset_name=dataset_name)
-    results = load_and_test_algo()        # load the trained model and get predictions on test data
+    # load the trained model and get predictions on test data
+    results = load_and_test_algo()        
     
     end = time.time()
     elapsed_time_in_minutes = np.round((end - start)/60.0, 2)

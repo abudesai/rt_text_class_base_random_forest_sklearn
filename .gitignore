@@ -1,10 +1,16 @@
 
 local_test/ml_vol/
-local_test/test_results/
+**/test_results/
 **/artifacts
 ml_vol/outputs/
 **/examples/**/*.txt
 
+artifacts/
+hpt_results/
+
+**/*_no_hpt.csv
+**/*_with_hpt.csv
+**/model_*_*_*.json
 
 docker-compose.yaml
 build_and_push.sh
@@ -23,5 +29,3 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-artifacts/

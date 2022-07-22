@@ -1,10 +1,6 @@
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-from feature_engine.wrappers import SklearnTransformerWrapper
-# from xgboost import XGBClassifier
-# from sklearn.ensemble import RandomForestClassifier
-# from inspect import signature
 import numpy as np, pandas as pd 
 from sklearn.pipeline import Pipeline, FeatureUnion, _fit_transform_one, _transform_one
 from scipy import sparse
@@ -139,26 +135,16 @@ def get_target_pipeline(model_cfg):
                 )
         )
     )         
-    # select the text column
+    # label binarizer
     pipe_steps.append(
         (
-            pp_step_names["TARGET_ONE_HOT_ENCODER"],
-            preprocessors.TargetOneHotEncoder(                    
-                target_col='class'
-            ),
+            pp_step_names["LABEL_ENCODER"],
+            preprocessors.CustomLabelEncoder( target_col='class' ),
         )
-    )      
-    # == DROP TARGET FEATURE (we keep the one-hot encoded columns)
-    pipe_steps.append(
-        (
-            pp_step_names["TARGET_DROPPER"],
-            preprocessors.ColumnsSelector(
-                columns=['class'],
-                selector_type='drop')
-        )
-    )       
-    taget_pipeline = Pipeline( pipe_steps )    
-    return taget_pipeline
+    )  
+           
+    target_pipeline = Pipeline( pipe_steps )    
+    return target_pipeline
 
 
 
@@ -182,7 +168,9 @@ class PandasFeatureUnion(FeatureUnion):
         return Xs
 
     def merge_dataframes_by_column(self, Xs):
-        return pd.concat(Xs, axis="columns", copy=False)
+        Xs = [ X.reset_index(drop=True) for X in Xs]
+        merged = pd.concat(Xs, axis="columns", copy=False)
+        return merged
 
     def transform(self, X):        
         Xs = Parallel(n_jobs=self.n_jobs)(
@@ -201,33 +189,21 @@ class PandasFeatureUnion(FeatureUnion):
 
 def get_class_names(pipeline, model_cfg):
     pp_step_names = model_cfg["pp_params"]["pp_step_names"]   
-    target_ohe = None
+    lbl_binarizer = None
     for t in pipeline[pp_step_names['FEATURE_UNION']].transformer_list:
         if t[0] == pp_step_names["TARGET_PIPELINE"]:
             target_pipeline = t[1]
             for step_tup in target_pipeline.steps:
-                if step_tup[0] == pp_step_names['TARGET_ONE_HOT_ENCODER']:
-                    target_ohe = step_tup[1]
-                    class_names = target_ohe.target_classes
+                if step_tup[0] == pp_step_names['LABEL_ENCODER']:
+                    lbl_binarizer = step_tup[1]
+                    class_names = lbl_binarizer.classes_
                     break
     
-    if target_ohe is None: 
-        raise Exception("Error: Cannot find target_one_hot_encoder in pipeline.")    
-    
+    if lbl_binarizer is None: 
+        raise Exception("Error: Cannot find lbl_binarizer in pipeline.")  
     return class_names
 
-
-def get_inverse_transform_on_preds(pipeline, model_cfg, preds):
-    
-    pp_step_names = model_cfg["pp_params"]["pp_step_names"]    
-    
-    label_binarizer_lbl = pp_step_names['LABELBINARIZER']
-    label_binarizer = pipeline[label_binarizer_lbl]
-    preds = label_binarizer.inverse_transform(preds)    
-    
-       
-    return preds
-    
+ 
     
 
 def save_preprocessor(preprocess_pipe, file_path):

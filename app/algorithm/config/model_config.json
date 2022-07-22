@@ -33,7 +33,7 @@
       "ONE_HOT_ENCODER": "one_hot_encoder",
       "TARGET_ONE_HOT_ENCODER": "target_one_hot_encoder",
       "TARGET_DROPPER": "target_dropper",
-      "LABELBINARIZER": "label_binarizer",
+      "LABEL_ENCODER": "label_encoder",
       "FEATURE_DROPPER": "feature_dropper",
       "ARRAY_TO_DF_CONVERTER": "array_to_df_converter",
       "TARGET_FEATURE_ADDER": "target_feature_adder",

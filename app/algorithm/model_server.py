@@ -47,25 +47,17 @@ class ModelServer:
         if model is None:  raise Exception("No model found. Did you train first?")
                     
         # transform data - returns a dict of X (transformed input features) and Y(targets, if any, else None)
-        proc_data = preprocessor.transform(data)          
-        # Grab input features for prediction
-        pred_X = proc_data['X'].astype(np.float)        
-        # make predictions
+        proc_data = preprocessor.transform(data) 
+        pred_X = proc_data['X'].astype(np.float)   
         preds = model.predict_proba( pred_X )
-        
-        preds2 = np.zeros(shape=[pred_X.shape[0] , len(preds)])
-        for i, c in enumerate(preds):
-            preds2[:, i] = c[:, 1]
-        
-        return preds2    
+
+        return preds    
     
     
-    def predict_proba(self, data, data_schema):  
-        
+    def predict_proba(self, data, data_schema):          
         preds = self._get_predictions(data, data_schema)
-        # get class names (labels)
         class_names = pipeline.get_class_names(self.preprocessor, model_cfg)   
-        # return te prediction df with the id and class probability fields        
+        # return the prediction df with the id and class probability fields        
         preds_df = pd.concat( [ data[["id"]].copy(), pd.DataFrame(preds, columns = class_names)], axis=1 )
         return preds_df 
     
