@@ -16,7 +16,6 @@ MODEL_NAME = "text_class_random_forest_sklearn"
 class Classifier(): 
     
     def __init__(self, n_estimators = 100, min_samples_split = 2, min_samples_leaf = 1, **kwargs) -> None:
-        super(Classifier, self).__init__(**kwargs)
         self.n_estimators = int(n_estimators)
         self.min_samples_split = int(min_samples_split)
         self.min_samples_leaf = int(min_samples_leaf)

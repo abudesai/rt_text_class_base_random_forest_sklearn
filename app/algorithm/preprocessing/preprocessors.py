@@ -4,7 +4,7 @@ import nltk
 import re
 import sys , os
 import operator
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
+from sklearn.preprocessing import LabelEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
 
 stop_words_path = os.path.join(os.path.dirname(__file__), 'stop_words.txt')
