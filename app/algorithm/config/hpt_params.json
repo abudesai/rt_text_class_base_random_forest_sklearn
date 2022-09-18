@@ -2,7 +2,7 @@
   {
     "name": "n_estimators",
     "short_desc": "The number of trees in the forest.",
-    "default": 100,
+    "default": 200,
     "type": "int",
     "search_type": "uniform",
     "range_low": 100,
@@ -12,7 +12,7 @@
   {
     "name": "min_samples_split",
     "short_desc": "The minimum number of samples required to split an internal node",
-    "default": 2,
+    "default": 5,
     "type": "int",
     "search_type": "uniform",
     "range_low": 2,
@@ -23,7 +23,7 @@
   {
     "name": "min_samples_leaf",
     "short_desc": "The minimum number of samples required to be at a leaf node.",
-    "default": 1,
+    "default": 3,
     "type": "int",
     "search_type": "uniform",
     "range_low": 1,
