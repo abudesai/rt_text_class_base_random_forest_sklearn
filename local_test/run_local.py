@@ -255,12 +255,13 @@ def run_train_and_test(dataset_name, run_hpt, num_hpt_trials):
 
 if __name__ == "__main__": 
     
-    num_hpt_trials = 20
+    num_hpt_trials = 10
     run_hpt_list = [False, True]
     run_hpt_list = [False]
     
-    datasets = ["clickbait", "drug_reviews", "movie_reviews", "spam_text", "tweet_emotions"]
-    # datasets = ["spam_text"]
+    datasets = ["clickbait", "drug_reviews", "ecommerce_categories", "fake_job_postings", "hate_speech", 
+                "movie_reviews", "musical_instruments", "newsgroups", "spam_text", "tweet_emotions"]
+    # datasets = ["ecommerce_categories"]
     
     for run_hpt in run_hpt_list:
         all_results = []
