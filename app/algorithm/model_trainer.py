@@ -31,7 +31,7 @@ def get_trained_model(data, data_schema, hyper_params):
     # preprocess data
     print("Pre-processing data...")
     train_data, _, preprocess_pipe = preprocess_data(train_data, None, data_schema)       
-    train_X, train_y = train_data['X'].astype(np.float), train_data['y'].astype(np.float)
+    train_X, train_y = train_data['X'].astype(np.float16), train_data['y'].astype(np.float16)
     # print(train_X.shape, train_y.shape) ; sys.exit()  
     
         
